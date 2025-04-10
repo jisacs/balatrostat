@@ -10,6 +10,7 @@ class PokerApp:
         self.deck = Deck()
         self.deck.shuffle()
         self.hand = Hand(self.deck, 10)
+        self.bin = Deck(build=False)
 
         self.deck_label = tk.Label(master, text="Deck:")
         self.deck_label.pack()
@@ -18,7 +19,7 @@ class PokerApp:
         self.deck_display.tag_config('red_card', foreground="red")
         self.deck_display.tag_config('black_card', foreground="black")
         self.deck_display.pack()
-        self.update_deck_display()
+        self.update_display(self.deck_display, self.deck.cards)
 
         self.hand_label = tk.Label(master, text="Your Hand:")
         self.hand_label.pack()
@@ -28,6 +29,16 @@ class PokerApp:
         self.hand_display.tag_config('black_card', foreground="black")
         self.hand_display.pack()
         self.update_hand_display()
+
+
+        self.bin_label = tk.Label(master, text="bin:")
+        self.bin_label.pack()
+
+        self.bin_display = tk.Text(master, height=10, width=100)
+        self.bin_display.tag_config('red_card', foreground="red")
+        self.bin_display.tag_config('black_card', foreground="black")
+        self.bin_display.pack()
+        self.update_display(self.bin_display,  self.bin.cards)
 
 
     def group_and_sort_cards(self, cards, by_suit=True):
@@ -56,16 +67,16 @@ class PokerApp:
         return result
 
 
-    def update_deck_display(self):
-        self.deck_display.delete(1.0, tk.END)
-        suit_cards = self.group_and_sort_cards(self.deck.cards)
+    def update_display(self, board, cards):
+        board.delete(1.0, tk.END)
+        suit_cards = self.group_and_sort_cards(cards)
 
         # Display cards by suit
         for suit, cards in suit_cards.items():
             for card in cards:
                 tag = 'red_card' if suit in ['Hearts', 'Diamonds'] else 'black_card'
-                self.deck_display.insert(tk.END, f"{card} ", tag)
-            self.deck_display.insert(tk.END, "\n")
+                board.insert(tk.END, f"{card} ", tag)
+            board.insert(tk.END, "\n")
 
     def update_hand_display(self):
         self.hand_display.delete(1.0, tk.END)

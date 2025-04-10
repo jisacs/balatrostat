@@ -2,9 +2,10 @@ from Card import Card
 import random
 
 class Deck:
-    def __init__(self):
+    def __init__(self, build=True):
         self.cards = []
-        self.build()
+        if build:
+            self.build()
     
     def build(self):
         suits = ['Hearts', 'Diamonds', 'Spades', 'Clubs']
