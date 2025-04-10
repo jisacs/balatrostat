@@ -15,7 +15,7 @@ class PokerApp:
         self.deck_label = tk.Label(master, text="Deck:")
         self.deck_label.pack()
 
-        self.deck_display = tk.Text(master, height=10, width=100)
+        self.deck_display = tk.Text(master, height=5, width=100)
         self.deck_display.tag_config('red_card', foreground="red")
         self.deck_display.tag_config('black_card', foreground="black")
         self.deck_display.pack()
@@ -27,7 +27,7 @@ class PokerApp:
         self.hand_label = tk.Label(master, text="Your Hand:")
         self.hand_label.pack()
 
-        self.hand_display = tk.Text(master, height=10, width=100)
+        self.hand_display = tk.Text(master, height=5, width=100)
         self.hand_display.tag_config('red_card', foreground="red")
         self.hand_display.tag_config('black_card', foreground="black")
         self.hand_display.pack()
@@ -39,11 +39,33 @@ class PokerApp:
         self.bin_label = tk.Label(master, text="Bin:")
         self.bin_label.pack()
 
-        self.bin_display = tk.Text(master, height=10, width=100)
+        self.bin_display = tk.Text(master, height=5, width=100)
         self.bin_display.tag_config('red_card', foreground="red")
         self.bin_display.tag_config('black_card', foreground="black")
         self.bin_display.pack()
         self.update_display(self.bin_display, self.bin.cards)
+
+        self.move_from_bin_to_hand_button = tk.Button(master, text="Move from Bin to Hand", command=self.move_from_bin_to_hand)
+        self.move_from_bin_to_hand_button.pack()
+
+        self.stat_label = tk.Label(master, text="Statistics:")
+        self.stat_label.pack()
+        self.stat_display = tk.Text(master, height=50, width=100)
+        self.stat_display.pack()                
+
+    def move_from_bin_to_hand(self):
+        try:
+            selected_text = self.bin_display.get(tk.SEL_FIRST, tk.SEL_LAST).strip()
+            selected_cards = selected_text.split("\n")  # Split selected cards by line
+            for card_text in selected_cards:
+                self.move_card(card_text.strip(), self.bin, self.hand)
+            self.update_display(self.bin_display, self.bin.cards)
+            self.update_hand_display()
+        except tk.TclError:
+            pass  # Handle case where no selection is made
+
+
+
 
     def move_to_hand(self):
         try:
