@@ -77,9 +77,6 @@ class PokerApp:
         except tk.TclError:
             pass  # Handle case where no selection is made
 
-
-
-
     def move_to_hand(self):
         try:
             selected_text = self.deck_display.get(tk.SEL_FIRST, tk.SEL_LAST).strip()
@@ -111,8 +108,6 @@ class PokerApp:
 
 
     def group_and_sort_cards(self, cards, by_suit=True):
-
-        
         suits = ['Hearts', 'Diamonds', 'Spades', 'Clubs']
         value_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
                 'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14}
