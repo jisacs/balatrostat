@@ -7,56 +7,69 @@ class PokerApp:
         self.master = master
         master.title("Poker Game")
 
+        self.initialize_game_objects()
+        self.create_deck_display(master)
+        self.create_hand_display(master)
+        self.create_bin_display(master)
+        self.create_statistics_display(master)
+
+    def initialize_game_objects(self):
         self.deck = Deck()
         self.deck.shuffle()
         self.hand = Hand(self.deck, 10)
         self.bin = Deck(build=False)
 
+    def create_deck_display(self, master):
         self.deck_label = tk.Label(master, text="Deck:")
         self.deck_label.pack()
 
         self.deck_display = tk.Text(master, height=5, width=100)
-        self.deck_display.tag_config('red_card', foreground="red")
-        self.deck_display.tag_config('black_card', foreground="black")
+        self.configure_text_widget(self.deck_display)
         self.deck_display.pack()
         self.update_display(self.deck_display, self.deck.cards)
 
         self.move_to_hand_button = tk.Button(master, text="Move to Hand", command=self.move_to_hand)
         self.move_to_hand_button.pack()
 
+    def create_hand_display(self, master):
         self.hand_label = tk.Label(master, text="Your Hand:")
         self.hand_label.pack()
 
         self.hand_display = tk.Text(master, height=5, width=100)
-        self.hand_display.tag_config('red_card', foreground="red")
-        self.hand_display.tag_config('black_card', foreground="black")
+        self.configure_text_widget(self.hand_display)
         self.hand_display.pack()
         self.update_hand_display()
 
         self.move_to_bin_button = tk.Button(master, text="Move to Bin", command=self.move_to_bin)
         self.move_to_bin_button.pack()
 
+    def create_bin_display(self, master):
         self.bin_label = tk.Label(master, text="Bin:")
         self.bin_label.pack()
 
         self.bin_display = tk.Text(master, height=5, width=100)
-        self.bin_display.tag_config('red_card', foreground="red")
-        self.bin_display.tag_config('black_card', foreground="black")
+        self.configure_text_widget(self.bin_display)
         self.bin_display.pack()
         self.update_display(self.bin_display, self.bin.cards)
 
         self.move_from_bin_to_hand_button = tk.Button(master, text="Move from Bin to Hand", command=self.move_from_bin_to_hand)
         self.move_from_bin_to_hand_button.pack()
 
+    def create_statistics_display(self, master):
         self.stat_label = tk.Label(master, text="Statistics:")
         self.stat_label.pack()
+
         self.stat_display = tk.Text(master, height=50, width=100)
-        self.stat_display.pack()                
+        self.stat_display.pack()
+
+    def configure_text_widget(self, widget):
+        widget.tag_config('red_card', foreground="red")
+        widget.tag_config('black_card', foreground="black")       
 
     def move_from_bin_to_hand(self):
         try:
             selected_text = self.bin_display.get(tk.SEL_FIRST, tk.SEL_LAST).strip()
-            selected_cards = selected_text.split("\n")  # Split selected cards by line
+            selected_cards = selected_text.split(" ")  # Split selected cards by line
             for card_text in selected_cards:
                 self.move_card(card_text.strip(), self.bin, self.hand)
             self.update_display(self.bin_display, self.bin.cards)
