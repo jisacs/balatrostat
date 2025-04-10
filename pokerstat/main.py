@@ -21,6 +21,9 @@ class PokerApp:
         self.deck_display.pack()
         self.update_display(self.deck_display, self.deck.cards)
 
+        self.move_to_hand_button = tk.Button(master, text="Move to Hand", command=self.move_to_hand)
+        self.move_to_hand_button.pack()
+
         self.hand_label = tk.Label(master, text="Your Hand:")
         self.hand_label.pack()
 
@@ -30,15 +33,46 @@ class PokerApp:
         self.hand_display.pack()
         self.update_hand_display()
 
+        self.move_to_bin_button = tk.Button(master, text="Move to Bin", command=self.move_to_bin)
+        self.move_to_bin_button.pack()
 
-        self.bin_label = tk.Label(master, text="bin:")
+        self.bin_label = tk.Label(master, text="Bin:")
         self.bin_label.pack()
 
         self.bin_display = tk.Text(master, height=10, width=100)
         self.bin_display.tag_config('red_card', foreground="red")
         self.bin_display.tag_config('black_card', foreground="black")
         self.bin_display.pack()
-        self.update_display(self.bin_display,  self.bin.cards)
+        self.update_display(self.bin_display, self.bin.cards)
+
+    def move_to_hand(self):
+        try:
+            selected_text = self.deck_display.get(tk.SEL_FIRST, tk.SEL_LAST).strip()
+            selected_cards = selected_text.split(" ")  # Split selected cards by line
+            for card_text in selected_cards:
+                self.move_card(card_text.strip(), self.deck, self.hand)
+            self.update_display(self.deck_display, self.deck.cards)
+            self.update_hand_display()
+        except tk.TclError:
+            pass  # Handle case where no selection is made
+
+    def move_to_bin(self):
+        try:
+            selected_text = self.hand_display.get(tk.SEL_FIRST, tk.SEL_LAST).strip()
+            selected_cards = selected_text.split(" ")  # Split selected cards by line
+            for card_text in selected_cards:
+                self.move_card(card_text.strip(), self.hand, self.bin)
+            self.update_hand_display()
+            self.update_display(self.bin_display, self.bin.cards)
+        except tk.TclError:
+            pass  # Handle case where no selection is made
+
+    def move_card(self, card_text, source_deck, target_deck):
+        for card in source_deck.cards:
+            if str(card) == card_text:
+                source_deck.cards.remove(card)
+                target_deck.cards.append(card)
+                break
 
 
     def group_and_sort_cards(self, cards, by_suit=True):
