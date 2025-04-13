@@ -114,15 +114,17 @@ class PokerApp:
 
     def update_statistics_display(self, M):
         self.stat_display.delete(1.0, tk.END)
-        selected_value = 'Ace' 
-        total_cartes = len(self.deck.cards)
-        M = min(M, total_cartes)
-        nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
-            
-        for N in range(1, min(total_cartes, M)+1):
-            stats = get_stats(N, M, total_cartes, nb_valeurs)
-            self.stat_display.insert(tk.END, f"N={N} => {stats} \n")
+        for selected_value in POKER_CONSTANTS.get_values():
+            self.stat_display.insert(tk.END, f"\n{selected_value} \t\t")
 
+            total_cartes = len(self.deck.cards)
+            M = min(M, total_cartes)
+            nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
+                
+            for N in range(1, min(total_cartes, M)+1):
+                stats = get_stats(N, M, total_cartes, nb_valeurs)
+                self.stat_display.insert(tk.END, f"[{N}] {stats*100:.1f} - ")
+            self.stat_display.insert(tk.END,"\n")
     def move_card(self, card_text, source_deck, target_deck):
         for card in source_deck.cards:
             if str(card) == card_text:
