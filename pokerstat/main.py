@@ -2,7 +2,7 @@ import tkinter as tk
 from pokerstat.Deck import Deck
 from pokerstat.Hand import Hand
 from pokerstat.Card import Card
-from pokerstat.stats import get_stats
+from pokerstat.stats import get_stats_same_value
 
 class PokerApp:
     def __init__(self, master):
@@ -69,7 +69,7 @@ class PokerApp:
         self.stat_display = tk.Text(master, height=50, width=100, background='black')
         self.stat_display.pack()
 
-        stats = get_stats([Card('2', 'Hearts'), Card('2', 'Clubs')], 
+        stats = get_stats_same_value([Card('2', 'Hearts'), Card('2', 'Clubs')], 
         self.deck)
         self.stat_display.insert(tk.END, f"{stats} ")
 
