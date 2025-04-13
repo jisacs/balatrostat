@@ -1,6 +1,8 @@
 import tkinter as tk
-from Deck import Deck
-from Hand import Hand
+from pokerstat.Deck import Deck
+from pokerstat.Hand import Hand
+from pokerstat.Card import Card
+from pokerstat.stats import get_stats
 
 class PokerApp:
     def __init__(self, master):
@@ -66,6 +68,10 @@ class PokerApp:
 
         self.stat_display = tk.Text(master, height=50, width=100, background='black')
         self.stat_display.pack()
+
+        stats = get_stats([Card('2', 'Hearts'), Card('2', 'Clubs')], 
+        self.deck)
+        self.stat_display.insert(tk.END, f"{stats} ")
 
     def configure_text_widget(self, widget):
         widget.tag_config('red_card', foreground="red")
