@@ -3,33 +3,34 @@ from pokerstat.Deck import Deck
 from pokerstat.Hand import Hand
 from pokerstat.Card import Card
 from pokerstat.stats import proba_au_moins_N_valeurs as get_stats
+from pokerstat.constant import POKER_CONSTANTS
 
 class PokerApp:
     def __init__(self, master):
         self.master = master
         master.title("Poker Game")
-
+        self.master.configure(background='white')
         self.initialize_game_objects()
         self.create_deck_display(master)
         self.create_hand_display(master)
         self.create_bin_display(master)
         self.create_statistics_display(master)
+        self.configure_text_widget(self.deck_display)
+        self.configure_text_widget(self.hand_display)
+        self.configure_text_widget(self.bin_display)
+        self.configure_text_widget(self.stat_display)
 
     def initialize_game_objects(self):
-        #self.deck = Deck(build=False)
-        self.deck = Deck()
-        #self.deck.cards = [Card('Ace', 'Hearts'), Card('Ace', 'Clubs'),
-        #Card('King', 'Hearts'), Card('King', 'Clubs')]
+        self.deck = Deck.create_standard_deck()
         self.deck.shuffle()
         self.hand = Hand(self.deck, 1)
-        self.bin = Deck(build=False)
+        self.bin = Deck()
 
     def create_deck_display(self, master):
         self.deck_label = tk.Label(master, text="Deck:", background='white')
         self.deck_label.pack()
 
         self.deck_display = tk.Text(master, height=5, width=100, background='white')
-        self.configure_text_widget(self.deck_display)
         self.deck_display.pack()
         self.update_display(self.deck_display, self.deck.cards)
 
@@ -44,7 +45,6 @@ class PokerApp:
 
         self.hand_display = tk.Text(master, height=5, width=100,
          background='white')
-        self.configure_text_widget(self.hand_display)
         self.hand_display.pack()
         self.update_hand_display()
 
@@ -57,7 +57,6 @@ class PokerApp:
         self.bin_label.pack()
 
         self.bin_display = tk.Text(master, height=5, width=100, background='white')
-        self.configure_text_widget(self.bin_display)
         self.bin_display.pack()
         self.update_display(self.bin_display, self.bin.cards)
 
@@ -74,7 +73,9 @@ class PokerApp:
 
     def configure_text_widget(self, widget):
         widget.tag_config('red_card', foreground="red")
-        widget.tag_config('black_card', foreground="black")       
+        widget.tag_config('black_card', foreground="black")
+        widget.tag_config('selected', background="yellow")
+        widget.tag_config('hand_card', foreground="green")
 
     def move_from_bin_to_hand(self):
         try:
@@ -112,13 +113,6 @@ class PokerApp:
             pass  # Handle case where no selection is made
 
     def update_statistics_display(self, M):
-        '''
-        get_stats(N, M, total_cartes, nb_valeurs)
-            N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
-            M (int): Nombre total de cartes tirées.
-            total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
-            nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
-    '''
         self.stat_display.delete(1.0, tk.END)
         selected_value = 'Ace' 
         total_cartes = len(self.deck.cards)
@@ -126,18 +120,8 @@ class PokerApp:
         nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
             
         for N in range(1, min(total_cartes, M)+1):
-                
             stats = get_stats(N, M, total_cartes, nb_valeurs)
-            print('''
-            N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
-            M (int): Nombre total de cartes tirées.
-            total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
-            nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
-
-            ''')
-            print(f'N: {N}, M: {M}, total_cartes: {total_cartes}, nb_valeurs: {nb_valeurs} => {stats}')
             self.stat_display.insert(tk.END, f"N={N} => {stats} \n")
-
 
     def move_card(self, card_text, source_deck, target_deck):
         for card in source_deck.cards:
@@ -146,30 +130,18 @@ class PokerApp:
                 target_deck.cards.append(card)
                 break
 
-
     def group_and_sort_cards(self, cards, by_suit=True):
-        suits = ['Hearts', 'Diamonds', 'Spades', 'Clubs']
-        value_order = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
-                'Jack': 11, 'Queen': 12, 'King': 13, 'Ace': 14}
-
         if by_suit:
-            #result = ['Hearts', 'Diamonds', 'Spades', 'Clubs']
-            result = {suit: [] for suit in suits}
-
-            # Group cards by suit
+            result = {suit: [] for suit in POKER_CONSTANTS.get_suits()}
             for card in cards:
                 result[card.suit].append(card)
-
-            for suit in suits:
-                result[suit].sort(key=lambda card: value_order[card.value], reverse=True)
+            for suit in POKER_CONSTANTS.get_suits():
+                result[suit].sort(key=lambda card: POKER_CONSTANTS.get_value_rank(card.value), reverse=True)
+            return result
         else:
-             # Group cards without ergarding suit
-            result = []
-            for card in cards:
-                result.append(card)
-            result.sort(key=lambda card: value_order[card.value], reverse=True)
-        return result
-
+            # Sort by value
+            cards.sort(key=lambda card: POKER_CONSTANTS.get_value_rank(card.value), reverse=True)
+            return cards
 
     def update_display(self, board, cards):
         board.delete(1.0, tk.END)
@@ -190,10 +162,8 @@ class PokerApp:
         for card in sorted_cards:
             tag = 'red_card' if card.suit in ['Hearts', 'Diamonds'] else 'black_card'
             self.hand_display.insert(tk.END, f"{card} ", tag)
-    
-# Bind the methods to the PokerApp class
+
 if __name__ == "__main__":
     root = tk.Tk()
-    root.configure(background='white')
     app = PokerApp(root)
     root.mainloop()
