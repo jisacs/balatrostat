@@ -20,46 +20,51 @@ class PokerApp:
         self.bin = Deck(build=False)
 
     def create_deck_display(self, master):
-        self.deck_label = tk.Label(master, text="Deck:")
+        self.deck_label = tk.Label(master, text="Deck:", background='white')
         self.deck_label.pack()
 
-        self.deck_display = tk.Text(master, height=5, width=100)
+        self.deck_display = tk.Text(master, height=5, width=100, background='white')
         self.configure_text_widget(self.deck_display)
         self.deck_display.pack()
         self.update_display(self.deck_display, self.deck.cards)
 
-        self.move_to_hand_button = tk.Button(master, text="Move to Hand", command=self.move_to_hand)
+        self.move_to_hand_button = tk.Button(master, text="Move to Hand", 
+        command=self.move_to_hand, background='white')
         self.move_to_hand_button.pack()
 
     def create_hand_display(self, master):
-        self.hand_label = tk.Label(master, text="Your Hand:")
+        self.hand_label = tk.Label(master, text="Your Hand:",
+         background='white')
         self.hand_label.pack()
 
-        self.hand_display = tk.Text(master, height=5, width=100)
+        self.hand_display = tk.Text(master, height=5, width=100,
+         background='white')
         self.configure_text_widget(self.hand_display)
         self.hand_display.pack()
         self.update_hand_display()
 
-        self.move_to_bin_button = tk.Button(master, text="Move to Bin", command=self.move_to_bin)
+        self.move_to_bin_button = tk.Button(master, text="Move to Bin", 
+        command=self.move_to_bin, background='white')
         self.move_to_bin_button.pack()
 
     def create_bin_display(self, master):
-        self.bin_label = tk.Label(master, text="Bin:")
+        self.bin_label = tk.Label(master, text="Bin:", background='white')
         self.bin_label.pack()
 
-        self.bin_display = tk.Text(master, height=5, width=100)
+        self.bin_display = tk.Text(master, height=5, width=100, background='white')
         self.configure_text_widget(self.bin_display)
         self.bin_display.pack()
         self.update_display(self.bin_display, self.bin.cards)
 
-        self.move_from_bin_to_hand_button = tk.Button(master, text="Move from Bin to Hand", command=self.move_from_bin_to_hand)
+        self.move_from_bin_to_hand_button = tk.Button(master, text="Move from Bin to Hand",
+         command=self.move_from_bin_to_hand, background='white')
         self.move_from_bin_to_hand_button.pack()
 
     def create_statistics_display(self, master):
-        self.stat_label = tk.Label(master, text="Statistics:")
+        self.stat_label = tk.Label(master, text="Statistics:", background='black')
         self.stat_label.pack()
 
-        self.stat_display = tk.Text(master, height=50, width=100)
+        self.stat_display = tk.Text(master, height=50, width=100, background='black')
         self.stat_display.pack()
 
     def configure_text_widget(self, widget):
@@ -154,5 +159,6 @@ class PokerApp:
 # Bind the methods to the PokerApp class
 if __name__ == "__main__":
     root = tk.Tk()
+    root.configure(background='white')
     app = PokerApp(root)
     root.mainloop()
