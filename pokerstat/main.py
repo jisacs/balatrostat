@@ -2,7 +2,7 @@ import tkinter as tk
 from pokerstat.Deck import Deck
 from pokerstat.Hand import Hand
 from pokerstat.Card import Card
-from pokerstat.stats import proba_exactement_N_valeurs_incomplete_game as get_stats
+from pokerstat.stats import proba_au_moins_N_valeurs as get_stats
 
 class PokerApp:
     def __init__(self, master):
@@ -106,28 +106,38 @@ class PokerApp:
                 self.move_card(card_text.strip(), self.hand, self.bin)
             self.update_hand_display()
 
-            '''
-            get_stats(N, M, total_cartes, nb_valeurs)
-                N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
-                M (int): Nombre total de cartes tirées.
-                total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
-                nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
-            '''
-            self.stat_display.delete(1.0, tk.END)
-            selected_value = 'Ace' 
-            M = len(selected_cards)
-            total_cartes = len(self.deck.cards)
-            nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
-              
-            for N in range(1, M+1):
-                 
-                stats = get_stats(N, M, total_cartes, nb_valeurs)
-                print(f'N: {N}, M: {M}, total_cartes: {total_cartes}, nb_valeurs: {nb_valeurs} => {stats}')
-                self.stat_display.insert(tk.END, f"N={N} => {stats} \n")
-
+            self.update_statistics_display(len(selected_cards))
             self.update_display(self.bin_display, self.bin.cards)
         except tk.TclError:
             pass  # Handle case where no selection is made
+
+    def update_statistics_display(self, M):
+        '''
+        get_stats(N, M, total_cartes, nb_valeurs)
+            N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
+            M (int): Nombre total de cartes tirées.
+            total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
+            nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
+    '''
+        self.stat_display.delete(1.0, tk.END)
+        selected_value = 'Ace' 
+        total_cartes = len(self.deck.cards)
+        M = min(M, total_cartes)
+        nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
+            
+        for N in range(1, min(total_cartes, M)+1):
+                
+            stats = get_stats(N, M, total_cartes, nb_valeurs)
+            print('''
+            N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
+            M (int): Nombre total de cartes tirées.
+            total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
+            nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
+
+            ''')
+            print(f'N: {N}, M: {M}, total_cartes: {total_cartes}, nb_valeurs: {nb_valeurs} => {stats}')
+            self.stat_display.insert(tk.END, f"N={N} => {stats} \n")
+
 
     def move_card(self, card_text, source_deck, target_deck):
         for card in source_deck.cards:
