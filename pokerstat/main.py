@@ -2,7 +2,7 @@ import tkinter as tk
 from pokerstat.Deck import Deck
 from pokerstat.Hand import Hand
 from pokerstat.Card import Card
-from pokerstat.stats import get_stats_same_value
+from pokerstat.stats import proba_exactement_N_valeurs_incomplete_game as get_stats
 
 class PokerApp:
     def __init__(self, master):
@@ -16,9 +16,12 @@ class PokerApp:
         self.create_statistics_display(master)
 
     def initialize_game_objects(self):
+        #self.deck = Deck(build=False)
         self.deck = Deck()
+        #self.deck.cards = [Card('Ace', 'Hearts'), Card('Ace', 'Clubs'),
+        #Card('King', 'Hearts'), Card('King', 'Clubs')]
         self.deck.shuffle()
-        self.hand = Hand(self.deck, 10)
+        self.hand = Hand(self.deck, 1)
         self.bin = Deck(build=False)
 
     def create_deck_display(self, master):
@@ -69,10 +72,6 @@ class PokerApp:
         self.stat_display = tk.Text(master, height=50, width=100, background='black')
         self.stat_display.pack()
 
-        stats = get_stats_same_value([Card('2', 'Hearts'), Card('2', 'Clubs')], 
-        self.deck)
-        self.stat_display.insert(tk.END, f"{stats} ")
-
     def configure_text_widget(self, widget):
         widget.tag_config('red_card', foreground="red")
         widget.tag_config('black_card', foreground="black")       
@@ -106,6 +105,26 @@ class PokerApp:
             for card_text in selected_cards:
                 self.move_card(card_text.strip(), self.hand, self.bin)
             self.update_hand_display()
+
+            '''
+            get_stats(N, M, total_cartes, nb_valeurs)
+                N (int): Nombre de cartes spécifiques souhaitées (ex: N As).
+                M (int): Nombre total de cartes tirées.
+                total_cartes (int): Nombre total de cartes dans le jeu (par exemple 40 ou 60).
+                nb_valeurs (int): Nombre de cartes de la valeur ciblée dans le jeu (par exemple 3 ou 5).
+            '''
+            self.stat_display.delete(1.0, tk.END)
+            selected_value = 'Ace' 
+            M = len(selected_cards)
+            total_cartes = len(self.deck.cards)
+            nb_valeurs = len([card for card in self.deck.cards if card.value == selected_value])
+              
+            for N in range(1, M+1):
+                 
+                stats = get_stats(N, M, total_cartes, nb_valeurs)
+                print(f'N: {N}, M: {M}, total_cartes: {total_cartes}, nb_valeurs: {nb_valeurs} => {stats}')
+                self.stat_display.insert(tk.END, f"N={N} => {stats} \n")
+
             self.update_display(self.bin_display, self.bin.cards)
         except tk.TclError:
             pass  # Handle case where no selection is made
